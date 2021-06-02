@@ -1,35 +1,36 @@
 #include <iostream>
-#include <windows.h> //·|¥Î¨ìwindows ªºAPI 
-#include <conio.h> //°»´ú¨Ï¥ÎªÌªºÁä½L 
-#include <cstdlib> //¨Ï¥Î¶Ã¼Æ 
-#include <ctime> //¥Î®É¶¡ªì©l¤Æ¥¦ 
+#include <windows.h>  //æœƒç”¨åˆ°windows çš„API 
+#include <conio.h> //åµæ¸¬ä½¿ç”¨è€…çš„éµç›¤ 
+#include <cstdlib> //ä½¿ç”¨äº‚æ•¸ 
+#include <ctime> //ç”¨æ™‚é–“åˆå§‹åŒ–å®ƒ 
 
 using namespace std;
 
-// ¹CÀ¸ÅÜ¼Æ«Å§i 
-bool gameOver; //§PÂ_¹CÀ¸¬O§_µ²§ô
+// éŠæˆ²è®Šæ•¸å®£å‘Š 
+bool gameOver; //åˆ¤æ–·éŠæˆ²æ˜¯å¦çµæŸ
 const int width = 25;
 const int height = 15;
 int x, y, coinX, coinY, score;
-int nTail; // ¬ö¿ı¥Ø«e³Dªºªø«×
-int tailX[150]; int tailY[150]; //¦s³D¨­Åéªº®y¼Ğ 
-int direction; //¥Î¼Æ¦r¥Nªí¤W¤U¥ª¥k²¾°Ê¤è¦V 
+int nTail; // ç´€éŒ„ç›®å‰è›‡çš„é•·åº¦
+int tailX[150]; int tailY[150]; // å­˜è›‡èº«é«”çš„åº§æ¨™ 
+int direction; // ç”¨æ•¸å­—ä»£è¡¨ä¸Šä¸‹å·¦å³ç§»å‹•æ–¹å‘ 
 const int Stop = 0, Left = 1, Right = 2, Up = 3, Down = 4;
 
 
-// ¨ç¼Æ 
-void Clear() //§ó·sµe­±®É§R°£µe­±¥Îªº 
+// å‡½æ•¸ 
+void Clear() // æ›´æ–°ç•«é¢æ™‚åˆªé™¤ç•«é¢ç”¨çš„ 
 {
   COORD scrn;
   HANDLE hOuput = GetStdHandle(STD_OUTPUT_HANDLE);
-  scrn.X = 0; //´å¼Ğ¦ì¸mªì©l¤Æ 
+  scrn.X = 0; // æ¸¸æ¨™ä½ç½®åˆå§‹åŒ– 
   scrn.Y = 0;
   SetConsoleCursorPosition(hOuput,scrn);
   return;
 }
 
 
-void SetUp(){ //ªì©l¤Æ¹CÀ¸ÅÜ¼Æ 
+void SetUp(){ // åˆå§‹åŒ–éŠæˆ²è®Šæ•¸ 
+	Clear(); // for æ¸¸æ¨™ä½ç½®åˆå§‹åŒ– 
 	gameOver = 0;
 	direction = Stop;
 	x = width/2;
@@ -37,64 +38,71 @@ void SetUp(){ //ªì©l¤Æ¹CÀ¸ÅÜ¼Æ
 	flag : 
 	coinX = rand() % (width - 1)+1;
 	coinY = rand() % (height - 1)+1;
-	if (x == coinX && y == coinY){ //Á×§K³DªºÀY¤@¶}©l´N¸ò¿ú¹ô¦ì¸m¤@¼Ë 
+	if (x == coinX && y == coinY){ //é¿å…è›‡çš„é ­ä¸€é–‹å§‹å°±è·ŸéŒ¢å¹£ä½ç½®ä¸€æ¨£ 
 		goto flag;
 	}
 	return;
 }
 
 
-void Draw(){ //²£¥Í¹CÀ¸µe­± 
-	Sleep(100);  //Åıµe­±¼È°± sleep³æ¦ì²@¬í 
+void Draw(){ //ç”¢ç”ŸéŠæˆ²ç•«é¢ 
+	Sleep(100);  //è®“ç•«é¢æš«åœ sleepå–®ä½æ¯«ç§’  
 	Clear();
 	
-	for(int i = 0; i < width+2; i++){
+	// top boarder
+	for(int i = 0; i < width; i++){
 		cout << "=";
 	}
 	cout << endl;
 	
 	for(int i = 0; i < height; i++){
 		for(int j = 0; j < width; j++){
-			if(j ==0){
+			
+			if (j == 0 || j == width-1) { 
+				// right left boarder
 				cout << "|";
-			}	
-			if(i == y && j == x){
+			} else if (i == y && j == x) {
+				// snake head
 				cout << "*";
-		}
-			else if(i == coinY && j == coinX){
+			} else if (i == coinY && j == coinX){
+				// coin pos
 				cout << "$";
-			}
-			else{
+			} else {
+
 				bool printSnake = false;
 				for(int k = 0; k < nTail; k++){
 					if(tailX[k] == j && tailY[k] == i){
-						cout << "*";
+						cout << "o";
 						printSnake = true;
 					} 
-					if(!printSnake){
+				}
+				if (!printSnake)
 					cout << " ";
-					}
-				}
-			if(j == width-1){
-				cout << "|";
-				}
 			}
-	cout << endl;	
+		}
+
+		cout << endl;	
 	}
 
-	for(int i = 0; i < width+2; i++){
-		cout << "=";
-		}
-	cout << endl;
-	cout << "Score: " << score << endl; 
-	
-	return;
-}} 
 
- //±µ¦¬¿é¤J­È 
+	// bot boarder
+	for (int i = 0; i < width; i++) {
+			cout << "=";
+	}
+	cout << endl;
+
+	// score
+	cout << "Score: " << score << endl; 
+	return;
+} 
+
+//æ¥æ”¶è¼¸å…¥å€¼ 
 void Input(){
 	if(kbhit()){
-		switch(getch()){
+		char c = getch();
+		// printf("here '%c'\n", c);
+
+		switch(c){
 			case 'a' :
 				direction = Left;
 				break;
@@ -115,7 +123,7 @@ void Input(){
 		return;
 }
 
-//¥]§t¹CÀ¸ªººtºâªk 
+//åŒ…å«éŠæˆ²çš„æ¼”ç®—æ³• 
 void Algorithm(){ 
 	int prevX = tailX[0];
 	int prevY = tailY[0];
